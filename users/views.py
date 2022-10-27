@@ -1,9 +1,13 @@
 from django.shortcuts import render
 from rest_framework.views import APIView
+from rest_framework import permissions
 from rest_framework.response import Response
 from rest_framework import status
 
-from users.serializer import UserSerializer
+from users.serializer import UserSerializer, CustomTokenObtainPairSerializer
+from rest_framework_simplejwt.views import TokenObtainPairView
+
+
 
 
 
@@ -19,3 +23,13 @@ class UserAPI(APIView):
             return Response({"message":f"${serializer.errors}"}, status=status.HTTP_400_BAD_REQUEST)
 
 
+class CustomTokenObtainPairView(TokenObtainPairView):
+    serializer_class = CustomTokenObtainPairSerializer
+
+class mockView(APIView):
+    permission_classes = [permissions.IsAuthenticated]
+    def get(self, request):
+        user = request.user
+        user.is_admin = True
+        user.save()
+        return Response("get 요청")
